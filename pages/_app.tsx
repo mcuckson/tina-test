@@ -13,9 +13,11 @@ export default class Site extends App {
     super(props)
 
     const github = new GithubClient({
-      proxy: '/api/proxy-github',
-      authCallbackRoute: '/api/create-github-access-token',
-      clientId: process.env.GITHUB_CLIENT_ID,
+	/* proxy: 'http://localhost:3001/proxy-github', */
+	proxy: '/api/proxy-github',
+	/* authCallbackRoute: 'http://localhost:3001/api/create-github-access-token', */
+	authCallbackRoute: '/api/create-github-access-token',
+	clientId: process.env.GITHUB_CLIENT_ID,
       baseRepoFullName: process.env.REPO_FULL_NAME, // e.g: tinacms/tinacms.org,
       baseBranch: process.env.BASE_BRANCH, // e.g. 'master' or 'main' on newer repos
     })
@@ -60,6 +62,7 @@ export default class Site extends App {
            */}
           <EditLink cms={this.cms} />
           <Component {...pageProps} />
+	  
         </TinacmsGithubProvider>
       </TinaProvider>
     )
@@ -74,8 +77,10 @@ const onLogin = async () => {
     headers.append('Authorization', 'Bearer ' + token)
   }
 
+
   const resp = await fetch(`/api/preview`, { headers: headers })
   const data = await resp.json()
+    /* throw new Error(JSON.stringify(data)+ resp.status); */
 
   if (resp.status == 200) window.location.href = window.location.pathname
   else throw new Error(data.message)
@@ -92,6 +97,7 @@ export interface EditLinkProps {
 }
 
 export const EditLink = ({ cms }: EditLinkProps) => {
+    console.log(cms.enabled);
   return (
     <button onClick={() => cms.toggle()}>
       {cms.enabled ? 'Exit Edit Mode' : 'Edit This Site'}
